@@ -8,6 +8,7 @@ function random(min, max) {
 }
 
 document.addEventListener("keydown", move);
+document.addEventListener("mousemove", mouseMove);
 
 class slope {
   constructor(a, p) {
@@ -61,5 +62,34 @@ function loop() {
   }
   ctx.strokeSyle = "black";
   ctx.stroke();
+  checkCollision();
   requestAnimationFrame(loop);
+}
+
+let mouse = {
+  x: 0,
+  y: 0,
+};
+
+function mouseMove(event) {
+  mouse.x = event.x;
+  mouse.y = event.y;
+}
+
+function checkCollision() {
+  let sum = 0;
+  for (let i = 0; i < waves.length; i++) {
+    sum += Math.sin(waves[i].p * (mouse.x + mapX)) * waves[i].a;
+  }
+  let inside = false;
+  4;
+  if (sum + cnv.height / 2 - mouse.y < 0) {
+    inside = true;
+  }
+  ctx.fillStyle = "green";
+  if (!inside) {
+    ctx.fillRect(mouse.x, mouse.y, 5, 5);
+  } else {
+    ctx.fillRect(mouse.x, sum + cnv.height / 2, 5, 5);
+  }
 }
