@@ -16,12 +16,67 @@ class slope {
     this.p = p;
   }
   display() {
-    ctx.beginPath();
-    ctx.moveTo(0, cnv.height / 2);
-    for (let x = 0; x < cnv.width; x++) {
-      ctx.lineTo(x, cnv.height / 2 + Math.cos(x * this.p) * this.a);
+    // ctx.beginPath();
+    // ctx.moveTo(0, cnv.height / 2);
+    // for (let x = 0; x < cnv.width; x++) {
+    //   ctx.lineTo(x, cnv.height / 2 + Math.cos(x * this.p) * this.a);
+    // }
+    // ctx.stroke();
+  }
+}
+
+class ball {
+  constructor(x, y, a, v, angle) {
+    this.x = x;
+    this.y = y;
+    this.a = a;
+    this.v = v;
+    this.angle = angle;
+    this.colliding = false;
+  }
+  draw() {
+    // ctx.fillStyle = "red";
+    // ctx.beginPath();
+    // ctx.arc(this.x, this.y, 10, 0, 2 * Math.PI);
+    // ctx.fill();
+  }
+  determineAngle() {
+    if (this.colliding) {
+      let nextY = cnv.height / 2;
+      for (let i = 0; i < waves.length; i++) {
+        nextY += Math.sin(waves[i].p * (this.x + mapX + 1)) * waves[i].a;
+      }
+      this.angle = Math.atan((nextY - this.y) / (this.x + 1 - this.x));
+    } else {
+      this.angle = (3 * Math.PI) / 2;
     }
-    ctx.stroke();
+    console.log((this.angle * 180) / Math.PI);
+  }
+  move() {
+    const gravity = Math.sin(this.angle) * 0.05;
+    this.v += gravity;
+    // console.log(this.v);
+    this.x += Math.cos(this.angle) * this.v;
+    this.y -= Math.sin(this.angle) * this.v;
+    // this.x += 1;
+    this.y += 5;
+    this.checkCollision();
+    this.determineAngle();
+    ctx.fillStyle = "red";
+    ctx.beginPath();
+    ctx.arc(this.x, this.y, 10, 0, 2 * Math.PI);
+    ctx.fill();
+  }
+  checkCollision() {
+    this.colliding = false;
+    let sum = 0;
+    for (let i = 0; i < waves.length; i++) {
+      sum += Math.sin(waves[i].p * (this.x + mapX)) * waves[i].a;
+    }
+    if (sum + cnv.height / 2 - this.y < 0) {
+      this.colliding = true;
+      this.y = sum + cnv.height / 2;
+    }
   }
 }
 
@@ -45,6 +100,8 @@ function move(event) {
   }
 }
 
+let Ball = new ball(300, 50, 50, 1, (3 * Math.PI) / 2);
+
 requestAnimationFrame(loop);
 function loop() {
   ctx.fillStyle = "white";
@@ -53,16 +110,15 @@ function loop() {
   ctx.moveTo(0, cnv.height / 2);
   for (let x = mapX; x < cnv.width + mapX; x++) {
     let y = cnv.height / 2;
-    //cycles through waves to add y values
     for (let i = 0; i < waves.length; i++) {
-      //y values are added together
       y += Math.sin(x * waves[i].p) * waves[i].a;
     }
     ctx.lineTo(x - mapX, y);
   }
   ctx.strokeSyle = "black";
   ctx.stroke();
-  checkCollision();
+  Ball.draw();
+  Ball.move();
   requestAnimationFrame(loop);
 }
 
@@ -76,20 +132,19 @@ function mouseMove(event) {
   mouse.y = event.y;
 }
 
-function checkCollision() {
-  let sum = 0;
-  for (let i = 0; i < waves.length; i++) {
-    sum += Math.sin(waves[i].p * (mouse.x + mapX)) * waves[i].a;
-  }
-  let inside = false;
-  4;
-  if (sum + cnv.height / 2 - mouse.y < 0) {
-    inside = true;
-  }
-  ctx.fillStyle = "green";
-  if (!inside) {
-    ctx.fillRect(mouse.x, mouse.y, 5, 5);
-  } else {
-    ctx.fillRect(mouse.x, sum + cnv.height / 2, 5, 5);
-  }
-}
+// // function checkCollision() {
+//   let sum = 0;
+//   for (let i = 0; i < waves.length; i++) {
+//     sum += Math.sin(waves[i].p * (mouse.x + mapX)) * waves[i].a;
+//   }
+//   let inside = false;
+//   if (sum + cnv.height / 2 - mouse.y < 0) {
+//     inside = true;
+//   }
+//   ctx.fillStyle = "green";
+//   if (!inside) {
+//     ctx.fillRect(mouse.x, mouse.y, 5, 5);
+//   } else {
+//     ctx.fillRect(mouse.x, sum + cnv.height / 2, 5, 5);
+//   }
+// // }
