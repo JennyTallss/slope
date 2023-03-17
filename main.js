@@ -47,19 +47,20 @@ class ball {
         nextY += Math.sin(waves[i].p * (this.x + mapX + 1)) * waves[i].a;
       }
       this.angle = Math.atan((nextY - this.y) / (this.x + 1 - this.x));
-    } else {
-      this.angle = (3 * Math.PI) / 2;
-    }
-    console.log((this.angle * 180) / Math.PI);
+    // } else {
+    //   this.angle = (Math.PI) / 2;
+    }     
   }
   move() {
     const gravity = Math.sin(this.angle) * 0.05;
     this.v += gravity;
     // console.log(this.v);
     this.x += Math.cos(this.angle) * this.v;
-    this.y -= Math.sin(this.angle) * this.v;
+    this.y += Math.sin(this.angle) * this.v;
+    // console.log(Math.sin(this.angle) * this.v)
+    console.log(gravity)
     // this.x += 1;
-    this.y += 5;
+    // this.y += 5;
     this.checkCollision();
     this.determineAngle();
     ctx.fillStyle = "red";
@@ -68,15 +69,15 @@ class ball {
     ctx.fill();
   }
   checkCollision() {
-    this.colliding = false;
+    // this.colliding = false;
     let sum = 0;
     for (let i = 0; i < waves.length; i++) {
       sum += Math.sin(waves[i].p * (this.x + mapX)) * waves[i].a;
     }
-    if (sum + cnv.height / 2 - this.y < 0) {
+    // if (sum + cnv.height / 2 - this.y < 0) {
       this.colliding = true;
       this.y = sum + cnv.height / 2;
-    }
+    // }
   }
 }
 
@@ -100,7 +101,7 @@ function move(event) {
   }
 }
 
-let Ball = new ball(300, 50, 50, 1, (3 * Math.PI) / 2);
+let Ball = new ball(300, 50, 50, 0, (3 * Math.PI) / 2);
 
 requestAnimationFrame(loop);
 function loop() {
@@ -131,20 +132,3 @@ function mouseMove(event) {
   mouse.x = event.x;
   mouse.y = event.y;
 }
-
-// // function checkCollision() {
-//   let sum = 0;
-//   for (let i = 0; i < waves.length; i++) {
-//     sum += Math.sin(waves[i].p * (mouse.x + mapX)) * waves[i].a;
-//   }
-//   let inside = false;
-//   if (sum + cnv.height / 2 - mouse.y < 0) {
-//     inside = true;
-//   }
-//   ctx.fillStyle = "green";
-//   if (!inside) {
-//     ctx.fillRect(mouse.x, mouse.y, 5, 5);
-//   } else {
-//     ctx.fillRect(mouse.x, sum + cnv.height / 2, 5, 5);
-//   }
-// // }
