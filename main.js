@@ -26,62 +26,66 @@ class slope {
 }
 
 class ball {
-  constructor(x, y, a, v, angle) {
+  constructor(x, y, angle) {
     this.x = x;
     this.y = y;
-    this.a = a;
-    this.v = v;
+    this.v = 0
+    this.xv = 0;
+    this.yv = 0;
     this.angle = angle;
     this.colliding = false;
   }
+
   draw() {
-    // ctx.fillStyle = "red";
-    // ctx.beginPath();
-    // ctx.arc(this.x, this.y, 10, 0, 2 * Math.PI);
-    // ctx.fill();
+    ctx.fillStyle = "red";
+    ctx.beginPath();
+    ctx.arc(this.x, this.y, 10, 0, 2 * Math.PI);
+    ctx.fill();
   }
+
   determineAngle() {
     if (this.colliding) {
       let nextY = cnv.height / 2;
       for (let i = 0; i < waves.length; i++) {
         nextY += Math.sin(waves[i].p * (this.x + mapX + 1)) * waves[i].a;
       }
-      this.angle = Math.atan((nextY - this.y) / (this.x + 1 - this.x));
-    // } else {
-    //   this.angle = (Math.PI) / 2;
+      this.angle = Math.atan(nextY - this.y);
+      console.log(this.angle * 180 / Math.PI)
     }     
   }
+
   move() {
-    const gravity = Math.sin(this.angle) * 0.05;
-    this.v += gravity;
-    // console.log(this.v);
-    this.x += Math.cos(this.angle) * this.v;
-    this.y += Math.sin(this.angle) * this.v;
-    // console.log(Math.sin(this.angle) * this.v)
-    console.log(gravity)
-    // this.x += 1;
-    // this.y += 5;
     this.checkCollision();
     this.determineAngle();
-    ctx.fillStyle = "red";
-    ctx.beginPath();
-    ctx.arc(this.x, this.y, 10, 0, 2 * Math.PI);
-    ctx.fill();
+
+    const gravity = Math.sin(this.angle) * 0.5;
+    if(this.colliding) {
+      this.xv += Math.cos(this.angle) * gravity
+      this.yv += Math.sin(this.angle) * gravity
+    } else {
+      this.yv += gravity
+    }
+
+    this.x += this.xv;
+    this.y += this.yv;
+
+    this.draw();
   }
+
   checkCollision() {
-    // this.colliding = false;
+    this.colliding = false;
     let sum = 0;
     for (let i = 0; i < waves.length; i++) {
       sum += Math.sin(waves[i].p * (this.x + mapX)) * waves[i].a;
     }
-    // if (sum + cnv.height / 2 - this.y < 0) {
+    if (sum + cnv.height / 2 - this.y < 0) {
       this.colliding = true;
       this.y = sum + cnv.height / 2;
-    // }
+    }
   }
 }
 
-const waves = [];
+let waves = [];
 
 function createWaves() {
   for (let i = 0; i < 20; i++) {
@@ -92,6 +96,8 @@ function createWaves() {
 }
 
 createWaves();
+
+waves = [new slope(0, 0)]
 //test
 let mapX = 0;
 
@@ -101,7 +107,7 @@ function move(event) {
   }
 }
 
-let Ball = new ball(300, 50, 50, 0, (3 * Math.PI) / 2);
+let Ball = new ball(300, 50, Math.PI / 2);
 
 requestAnimationFrame(loop);
 function loop() {
@@ -118,7 +124,6 @@ function loop() {
   }
   ctx.strokeSyle = "black";
   ctx.stroke();
-  Ball.draw();
   Ball.move();
   requestAnimationFrame(loop);
 }
